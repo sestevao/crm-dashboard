@@ -1,0 +1,882 @@
+<x-app-layout>
+    <div class="min-h-screen flex flex-col">
+        <x-slot name="header">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ __('Projects') }}
+                </h2>
+
+                <a href="{{ route('projects.create') }}" class="rounded-lg bg-blue-500 flex items-center justify-center p-2 space-x-2 text-white font-bold gap-2">
+                    <i class="fas fa-plus px-2" aria-hidden="true"></i>
+                    Add Project
+                </a>
+            </div>
+        </x-slot>
+
+        <div class="max-w-7xl mb-4 mx-auto px-2">
+            <div class="flex flex-col lg:flex-row lg:space-x-6">
+                <!-- Left Panel: Current Projects -->
+                <div class="w-full lg:w-1/4 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-gray-300 dark:border-gray-600 px-4 py-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Current Projects</h3>
+                        <a href="{{ route('projects.show', 1) }}"
+                            class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500 transition">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="border-r-4 border-blue-500 bg-blue-50 dark:bg-blue-900 p-4 flex flex-col gap-1">
+                            <p class="font-semibold text-gray-800 dark:text-gray-100">PN0001265</p>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Medical App (iOS native)</span>
+                            <a href="{{ route('projects.show', 1) }}"
+                                class="mt-2 text-blue-600 dark:text-blue-400 font-semibold text-sm flex items-center space-x-1 hover:underline">
+                                <span>View details</span>
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </div>
+
+                        @foreach ([
+                            ['code' => 'PN0001245', 'desc' => 'Food Delivery System'],
+                            ['code' => 'PN0001221', 'desc' => 'Fortune website'],
+                            ['code' => 'PN0001241', 'desc' => 'Planner App'],
+                            ['code' => 'PN0001211', 'desc' => 'Time tracker - personal account'],
+                            ['code' => 'PN0001246', 'desc' => 'Internal Project'],
+                        ] as $project)
+                            <div class="p-4 flex flex-col gap-1">
+                                <p class="font-semibold text-gray-800 dark:text-gray-100">{{ $project['code'] }}</p>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ $project['desc'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Right Panel: Tasks -->
+                <div class="w-full lg:w-3/4 lg:mt-0 flex flex-col h-full overflow-hidden">
+                    <div class="flex items-center justify-between px-4">
+                        <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">Tasks</h3>
+
+                        <div class="flex items-center space-x-2">
+                            <div id="listViewBtn" class="bg-white dark:bg-gray-700 rounded-lg p-2 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer transition" onclick="showView('list')">
+                                <i class="fas fa-bars p-2"></i>
+                            </div>
+                            <div id="boardViewBtn" class="bg-white dark:bg-gray-700 rounded-lg p-2 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer transition" onclick="showView('board')">
+                                <i class="fas fa-chart-bar p-2"></i>
+                            </div>
+                            <div id="timelineViewBtn" class="bg-white dark:bg-gray-700 rounded-lg p-2 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer transition" onclick="showView('timeline')">
+                                <i class="fa-solid fa-sliders p-2"></i>
+                            </div>
+
+                            <div class="bg-white dark:bg-gray-700 rounded-lg p-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition" onclick="toggleFilter()">
+                                <i class="fas fa-filter p-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="list" class="px-4 mt-4 hidden">
+                        <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Active Tasks</h4>
+
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>Research</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-yellow-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up px-2"></i>
+                                    <span class="font-bold">Medium</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-green-50 rounded-lg p-2 text-green-500 font-medium">
+                                <span>Done</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (100% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="100, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>Mind Map</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-yellow-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up px-2"></i>
+                                    <span class="font-bold">Medium</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-2 text-blue-500 font-medium">
+                                <span>In progress</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (80% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="80, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>UX sketches</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-yellow-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up px-2"></i>
+                                    <span class="font-bold">Medium</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-2 text-blue-500 font-medium">
+                                <span>In progress</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (80% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="80, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>UX Login + Registration</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-green-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-down px-2"></i>
+                                    <span class="font-bold">Low</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-2 text-gray-400 font-medium">
+                                <span>To Do</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (100% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="100, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>UI Login + Registration</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-yellow-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up px-2"></i>
+                                    <span class="font-bold">Medium</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-50 rounded-lg p-2 text-purple-500 font-medium">
+                                <span>In Review</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (80% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="100, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>UI for other screens</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d 4h</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>1d 2h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-yellow-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up px-2"></i>
+                                    <span class="font-bold">Medium</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-2 text-blue-500 font-medium">
+                                <span>In progress</span>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <!-- Background circle -->
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <!-- Progress circle (80% in this example) -->
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="80, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backlogs -->
+                        <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Backlogs</h4>
+
+                        <div class="bg-white rounded-lg p-2 flex items-center justify-between my-4 w-full">
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-gray-400 text-sm">Task Name</p>
+                            <p>Animation for buttons</p>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-gray-400 text-sm">Estimate</p>
+                            <p>6h</p>
+                        </div>
+                        
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-gray-400 text-sm">Spent Time</p>
+                            <p>0h</p>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-gray-400 text-sm">Assignee</p>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-gray-400 text-sm">Priority</p>
+                            <div class="text-yellow-400 flex items-center justify-center">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12.6129 19.7903L12.7071 19.7071L17.7071 14.7071C18.0976 14.3166 18.0976 13.6834 17.7071 13.2929C17.3466 12.9324 16.7794 12.9047 16.3871 13.2097L16.2929 13.2929L13 16.585V5C13 4.44772 12.5523 4 12 4C11.4872 4 11.0645 4.38604 11.0067 4.88338L11 5V16.585L7.70711 13.2929C7.34662 12.9324 6.77939 12.9047 6.3871 13.2097L6.29289 13.2929C5.93241 13.6534 5.90468 14.2206 6.2097 14.6129L6.29289 14.7071L11.2929 19.7071C11.6534 20.0676 12.2206 20.0953 12.6129 19.7903Z" fill="currentColor"/>
+                                </svg>
+
+                                <span class="font-bold">Medium</span>
+                            </div>
+                        </div>
+
+                        <div class="p-2 m-2">
+                            <div class="relative w-6 h-6">
+                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                    <!-- Background circle -->
+                                    <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <!-- Progress circle (80% in this example) -->
+                                    <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="0, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-2 flex items-center justify-between my-4 w-full">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Task Name</p>
+                                <p>Preloader</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Estimate</p>
+                                <p>2d</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Spent Time</p>
+                                <p>0h</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Assignee</p>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}"  alt="Team Member" class="w-6 h-6 border-gray-200 border rounded-full z-10"/>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-gray-400 text-sm">Priority</p>
+                                <div class="text-green-400 flex items-center justify-center">
+                                    <i class="fas fa-arrow-down px-2"></i>
+                                    <span class="font-bold">Low</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2 m-2">
+                                <div class="relative w-6 h-6">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="0, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-hidden" id="board">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4 w-full">
+                            <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">To Do</div>
+                            <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">In Progress</div>
+                            <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">In Review</div>
+                            <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">Done</div>
+                        </div>
+
+                        <div class="w-full text-center mb-4">
+                            <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Active Tasks</h4>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4 w-full">
+                            <div class="flex-col flex gap-2 task-column" data-id="todo">
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">UX sketches</span>
+
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">4d</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">UX Login + Registration</span>
+
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">UI Login + Registration (+ other screens)</span>
+
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">1d 6h</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-col flex gap-2 task-column" data-id="inprogress">
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">Mind Map</span>
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d 4h</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-col flex gap-2 task-column" data-id="inreview">
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">Research reports</span>
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">Research reports (presentation for client)</span>
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">6h</span>
+                                            <i class="fas fa-arrow-down text-green-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-col flex gap-2 task-column" data-id="done">
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">Research</span>
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">4d</span>
+                                            <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="bg-gray-200 rounded-xl px-6 py-2 text-center flex flex-col items-center justify-center gap-4 shadow">
+                            <h4 class=" rounded-xl text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Backlogs</h4>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                                <!-- Task Card -->
+                                @for ($i = 0; $i < 3; $i++)
+                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow">
+                                    <span class="text-sm text-gray-600 font-medium">TS000145</span>
+                                    <span class="text-gray-800">Animation for buttons</span>
+
+                                    <div class="flex items-center justify-between w-full mt-2">
+                                        <div class="flex items-center gap-1">
+                                            <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">8h</span>
+                                            <i class="fas fa-arrow-down text-green-400 text-sm"></i>
+                                        </div>
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                    </div>
+                                </div>
+                                @endfor
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="timeline" class="p-4">
+                        <!-- Task Rows -->
+                        @php
+                            $tasks = [ 'Research',  'Mind Map',  'UX Login + Registration',  'UI Kit', 'Testing',  'Client Feedback',  'Bug Fixing',  'Moodboard', 'Reports',  'Final Review'];
+        
+                            // Get current month's dates
+                            $currentMonth = now();
+                            $daysInMonth = $currentMonth->daysInMonth;
+                        @endphp
+
+                        <!-- Timeline Header -->
+                        <div class="flex bg-white rounded-lg p-2 overflow-x-auto">
+                            <!-- Fixed Task Label Header -->
+                            <div class="w-[200px] shrink-0 bg-white border-r-2 border-b-2 border-r-gray-200 border-b-gray-200 font-semibold text-left p-2 flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    All Tasks
+                                    <span class="text-sm text-gray-500 pt-4">(10 tasks)</span>
+                                </div>
+                                <i class="fas fa-angle-right self-center mt-2 px-2"></i>
+                            </div>
+
+                            <!-- Scrollable Date Header -->
+                            <div class="overflow-x-auto w-full border-b-2 border-b-gray-200">
+                                <div class="grid w-full">
+                                    <div class="col-span-31  text-center p-2 font-medium"> First Month (May)</div>
+                                </div>
+                                <div class="grid gap-2 rounded-lg p-2" style="grid-template-columns: repeat({{ $daysInMonth }}, minmax(40px, 1fr));">
+                                    @for ($day = 1; $day <= $daysInMonth; $day++)
+                                        <div class="text-sm text-center p-2 bg-blue-50 rounded-lg text-gray-500 font-bold">
+                                            {{ $day }}
+                                        </div>
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+
+                        @foreach ($tasks as $task)
+                            <div class="flex bg-white border-b-2 border-b-gray-200 transition-all duration-200">
+                                <div class="w-[200px] shrink-0 bg-white border-r-2 border-r-gray-200 font-semibold text-left p-4 mx-2 flex items-center justify-between">
+                                    {{ $task }}
+                                </div>
+
+                                <div class="grid gap-2 rounded-lg" style="grid-template-columns: repeat({{ $daysInMonth }}, minmax(40px, 1fr));" data-task="{{ $task }}">
+                                    @for ($day = 1; $day <= $daysInMonth; $day++)
+                                    <div class="task-day p-2 m-1 rounded-lg cursor-pointer transition-all duration-200 text-blue-100 bg-blue-50"
+                                        data-task="{{ $task }}"
+                                        data-day="{{ $day }}"
+                                        onclick="handleTaskDay(this)">
+                                        {{$day}}
+                                    </div>
+                                    @endfor
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <x-modal name="filter-modal" :show="false" maxWidth="lg" position="right">
+        <div id="filterPanel" class="p-6 translate-x-full transition-transform duration-300 ease-in-out">
+            <div class="flex justify-between items-center mb-4 border-b border-b-gray-100 gap-4">
+                <h3 class="text-lg font-semibold">Filters</h3>
+                <button onclick="toggleFilter()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Add your filter content here -->
+            <div class="space-y-4">
+                <div class="border-b border-b-gray-100 py-4">
+                    <x-input-label for="period" :value="__('Period')" />
+                    <x-text-input id="period" class="block mt-1 w-full" type="date" name="period" :value="old('period')" required autofocus autocomplete="date" />
+                    <x-input-error :messages="$errors->get('period')" class="mt-2" />
+                </div>
+
+                <div class="border-b border-b-gray-100 py-4 flex-col flex gap-4">
+                    <p class="text-md text-gray-500 font-semibold">Task Group</p>
+                    <label for="design" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="design" name="task_group" :value="old('task_group')" />
+                        <span>Design</span>
+                    </label> 
+
+                    <label for="development" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="development" name="task_group" :value="old('task_group')" />
+                        <span>Development</span>
+                    </label> 
+
+                    <label for="testing" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="testing" name="task_group" :value="old('task_group')" />
+                        <span>Testing</span>
+                    </label> 
+
+                    <label for="marketing" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="marketing" name="task_group" :value="old('task_group')" />
+                        <span>Marketing</span>
+                    </label> 
+
+                    <label for="project_management" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="project_management" name="task_group" :value="old('task_group')" />
+                        <span>Project Management</span>
+                    </label> 
+                </div>
+
+                <div class="border-b border-b-gray-100 py-4 flex-col flex gap-4">
+                    <p class="text-md text-gray-500 font-semibold">Reporter</p>
+
+                    <label for="oscar_holloway" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="oscar_holloway" name="reporter" :value="old('reporter')" />
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                        <span>Oscar Holloway</span>
+                    </label> 
+
+                    <label for="leonard_rodriguez" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="leonard_rodriguez" name="reporter" :value="old('reporter')" />
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                        <span>Leonard Rodriguez</span>
+                    </label> 
+
+                    <label for="owen_chambers" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="owen_chambers" name="reporter" :value="old('reporter')" />
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                        <span>Owen Chambers</span>
+                    </label> 
+
+                    <label for="gabriel_flowers" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="gabriel_flowers" name="reporter" :value="old('reporter')" />
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                        <span>Gabriel Flowers</span>
+                    </label> 
+
+                    <label for="violet_robbins" class="inline-flex items-center space-x-2">
+                        <x-checkbox id="violet_robbins" name="reporter" :value="old('reporter')" />
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                        <span>Violet Robbins</span>
+                    </label> 
+                   
+                    <p class="text-md text-blue-400 underline font-semibold">View more <i class="fas fa-angle-down px-1"></i></p>
+                </div>
+
+                <div class="border-b border-b-gray-100 py-4">
+                    <p class="text-md text-gray-500 font-semibold">Assignees</p>
+                    <x-text-input id="assignees" class="block mt-1 w-full" type="text" name="assignees" :value="old('assignees')" required autofocus autocomplete="assignees" />
+
+                    <div class="grid grid-cols-2 gap-4 py-2">
+                        <div class="bg-gray-100 rounded-full p-1 text-sm flex items-center justify-center gap-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                            <span>Violet Robbins</span>
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+
+                        <div class="bg-gray-100 rounded-full p-1 text-sm flex items-center justify-center gap-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                            <span>Ronald Robbins</span>
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+
+                        <div class="bg-gray-100 rounded-full p-1 text-sm flex items-center justify-center gap-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                            <span>Birdie Garner</span>
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+
+                        <div class="bg-gray-100 rounded-full p-1 text-sm flex items-center justify-center gap-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                            <span>Marvin Cooper</span>
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-2">
+                    <x-input-label for="estimate" :value="__('Estimate')" />
+                    <x-text-input id="estimate" class="block mt-1 w-full" type="text" name="estimate" :value="old('estimate')" required autofocus autocomplete="assignees" />
+                    <x-input-error :messages="$errors->get('assignees')" class="mt-2" />
+                </div>
+                
+                <div class="py-2">
+                    <x-input-label for="priority" :value="__('Priority')" />
+                    <x-text-input id="priority" class="block mt-1 w-full" type="text" name="priority" :value="old('priority')" required autofocus autocomplete="assignees" />
+                    <x-input-error :messages="$errors->get('assignees')" class="mt-2" />
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-6">
+                <div class="flex items-center justify-center text-sm">
+                    <i class="fas fa-info-circle px-2"></i> 
+                    10 matches found
+                </div>
+                <button onclick="toggleFilter()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Save Filters (3)
+                </button>
+            </div>
+        </div>
+    </x-modal>
+
+    <style>
+        .active {
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            color: white !important;
+        }
+        #filterPanel {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .task-card {
+            cursor: grab;
+        }
+        .task-card:active {
+            cursor: grabbing;
+        }
+    </style>
+
+    <script>
+        function toggleFilter() {
+            const modal = document.getElementById('modal-filter-modal');
+            const isOpen = modal && modal.getAttribute('aria-hidden') === 'false';
+
+            if (isOpen) {
+                window.dispatchEvent(new CustomEvent('close-modal', { detail: 'filter-modal' }));
+            } else {
+                window.dispatchEvent(new CustomEvent('open-modal', { detail: 'filter-modal' }));
+            }
+        }
+
+        function showView(viewId) {
+            $('#list, #board, #timeline').hide();
+            $('#listViewBtn, #boardViewBtn, #timelineViewBtn').removeClass('active');
+            $('#' + viewId + 'ViewBtn').addClass('active');
+            $('#' + viewId).show(); 
+        }
+
+        const tasks = [
+            { name: "Research", start: 1, duration: Math.floor(Math.random() * 4) + 2 },
+            { name: "Mind Map", start: 4, duration: Math.floor(Math.random() * 3) + 2 },
+            { name: "UX Login + Registration", start: 8, duration: Math.floor(Math.random() * 5) + 3 },
+            { name: "Testing", start: 13, duration: Math.floor(Math.random() * 4) + 2 },
+            { name: "Client Feedback", start: 16, duration: Math.floor(Math.random() * 3) + 1 },
+            { name: "Moodboard", start: 18, duration: Math.floor(Math.random() * 4) + 2 },
+            { name: "Reports", start: 22, duration: Math.floor(Math.random() * 3) + 2 },
+            { name: "Final Review", start: 25, duration: Math.floor(Math.random() * 3) + 1 }
+        ];
+
+        
+
+        // Show the list view by default when the page loads using jQuery's ready function
+        $(document).ready(function() {
+            showView('list');
+            window.toggleFilter = toggleFilter;
+            initializeTaskDays();
+
+            const placeholderHTML = '<div class="drop-placeholder h-20 border-2 border-dashed border-gray-300 rounded-xl my-2"></div>';
+
+            $('.task-column').each(function () {
+                new Sortable(this, {
+                    group: 'shared',
+                    animation: 150,
+                    ghostClass: 'bg-blue-100',
+
+                    onStart: function (evt) {
+                        // Add placeholder to each column
+                        $('.task-column').each(function () {
+                            $(this).append(placeholderHTML);
+                        });
+                    },
+
+                    onEnd: function (evt) {
+                    const task = evt.item;
+                    const newColumn = $(evt.to).data('id');
+
+                    console.log(`Task moved to: ${newColumn}`);
+
+                    $('.drop-placeholder').remove();
+                    }
+                });
+            });
+
+            tasks.forEach(task => {
+                const $row = $(`div[data-task="${task.name}"]`);
+                const $cells = $row.children();
+                for (let i = 0; i < task.duration; i++) {
+                    $cells.eq(task.start - 1 + i).remove();
+                }
+                const $taskBlock = $(`<div class="bg-blue-500 col-span-${task.duration} rounded text-xs text-white text-center flex items-center justify-center" style="grid-column: span ${task.duration};">`).text(task.name);
+                $cells.eq(task.start - 1).before($taskBlock);
+            });
+
+ 
+        });
+
+        function initializeTaskDays() {
+            $('.task-day').each(function() {
+                const $this = $(this);
+                const taskName = $this.data('task');
+                const day = parseInt($this.data('day'));
+                // updateTaskDayStyle($this, isTaskActive(taskName, day));
+                if (isTaskActive(taskName, day)) {
+                    $this.removeClass('bg-blue-50 text-blue-100').addClass('bg-blue-500 text-white active');
+                }
+            });
+        }
+
+        function updateTaskDayStyle($element, isActive) {
+            if (isActive) {
+                console.log('vvv')
+                $element.addClass('active bg-blue-500 text-white').removeClass('bg-blue-50 text-blue-100');
+            } else {
+                console.log('aaa')
+                $element.removeClass('active bg-blue-500 text-white').addClass('bg-blue-50 text-blue-100');
+            }
+        }
+
+        function isTaskActive(taskName, day) {
+            const task = tasks.find(t => t.name === taskName);
+            if (!task) return false;
+            return day >= task.start && day < (task.start + task.duration);
+        }
+
+    </script>
+</x-app-layout>
+
+    
