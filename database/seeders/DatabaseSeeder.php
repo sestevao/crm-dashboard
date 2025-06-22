@@ -13,29 +13,24 @@ use App\Models\Article;
 use App\Models\Document;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\ProjectUser;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create events
-        $eventTypes = ['meeting', 'training', 'social', 'workshop'];
-        $eventStatuses = ['upcoming', 'ongoing', 'completed'];
-
-        for ($i = 0; $i < 5; $i++) {
-            Event::create([
-                'title' => 'Company ' . ucfirst($eventTypes[array_rand($eventTypes)]),
-                'description' => 'Description for the event ' . ($i + 1),
-                'start_date' => now()->addDays(rand(1, 30)),
-                'end_date' => now()->addDays(rand(31, 60)),
-                'location' => 'Room ' . rand(100, 999),
-                'type' => $eventTypes[array_rand($eventTypes)],
-                'created_by' => User::inRandomOrder()->first()->id,
-                'attendees' => User::inRandomOrder()->limit(3)->pluck('id'),
-                'status' => $eventStatuses[array_rand($eventStatuses)],
-            ]);
+        // -- Create users for demo (if none exist) --
+        if (User::count() < 5) {
+            for ($i = 1; $i <= 5; $i++) {
+                User::create([
+                    'name' => 'User ' . $i,
+                    'email' => 'user' . $i . '@example.com',
+                    'password' => Hash::make('password'),
+                ]);
+            }
         }
 
         // Create projects
@@ -46,30 +41,55 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Project ' . ($i + 1),
                 'description' => 'Description for project ' . ($i + 1),
                 'image' => 'images/project' . ($i + 1) . '.jpg',
-                'start_date' => now(),
-                'deadline' => now()->addMonths(3),
+                'start_date' => now()->subDays(rand(10, 20)),
+                'deadline' => now()->addMonths(rand(1, 4)),
                 'status' => $projectStatuses[array_rand($projectStatuses)],
                 'manager_id' => User::inRandomOrder()->first()->id,
                 'budget' => rand(10000, 50000),
-                'progress' => rand(0, 100),
+                'progress' => rand(10, 90),
                 'team_members' => User::inRandomOrder()->limit(3)->pluck('id'),
             ]);
 
-            // Create tasks for each project
-            $taskPriorities = ['low', 'medium', 'high'];
+            // Realistic tasks for each project
+            $tasks = [
+                ['title' => 'Design Homepage', 'priority' => 'high', 'estimate' => 16],
+                ['title' => 'Develop Login Module', 'priority' => 'high', 'estimate' => 24],
+                ['title' => 'Set Up Database', 'priority' => 'medium', 'estimate' => 12],
+                ['title' => 'Create API Endpoints', 'priority' => 'low', 'estimate' => 30],
+            ];
+
             $taskStatuses = ['todo', 'in_progress', 'review', 'completed'];
 
-            for ($j = 0; $j < 4; $j++) {
+            foreach ($tasks as $index => $taskData) {
+                $dueDate = Carbon::parse($project->start_date)->addDays(rand(5, 30));
+
                 ProjectTask::create([
                     'project_id' => $project->id,
-                    'title' => 'Task ' . ($j + 1),
-                    'description' => 'Description for task ' . ($j + 1),
-                    'due_date' => now()->addDays(rand(1, 30)),
-                    'priority' => $taskPriorities[array_rand($taskPriorities)],
+                    'title' => $taskData['title'],
+                    'description' => 'Detailed task description for ' . $taskData['title'] . '.',
+                    'due_date' => $dueDate,
+                    'priority' => $taskData['priority'],
                     'status' => $taskStatuses[array_rand($taskStatuses)],
                     'assigned_to' => User::inRandomOrder()->first()->id,
+                    'created_at' => $project->start_date,
+                    'updated_at' => now(),
+                    'estimate' => $taskData['estimate'],
+                    'spent_time' => rand(0, $taskData['estimate']),
+                    'is_backlog' => 0,
                 ]);
             }
+        }
+
+        // Create project users with roles and progress
+        $roles = ['manager', 'assignee', 'reviewer'];
+        for ($i = 0; $i < 10; $i++) {
+            ProjectUser::create([
+                'project_id' => Project::inRandomOrder()->first()->id,
+                'user_id' => User::inRandomOrder()->first()->id,
+                'role' => $roles[array_rand($roles)],
+                'status' => 'active',
+                'progress' => rand(0, 100),
+            ]);
         }
 
         // Create vacancies

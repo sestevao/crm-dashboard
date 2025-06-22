@@ -10,8 +10,16 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::latest()->get();
-        return view('projects.index', compact('projects'));
+        $projects = Project::with(['tasks', 'manager'])
+            ->orderBy('start_date', 'desc')
+            ->get();
+
+        $allTasks = $projects->pluck('tasks')->flatten();
+
+        $backlogTasks = $allTasks->where('is_backlog', true);
+        $activeTasks = $allTasks->where('is_backlog', false);
+
+        return view('projects.index', compact('projects', 'backlogTasks', 'activeTasks', 'allTasks'));
     }
 
     public function create()
@@ -90,7 +98,7 @@ class ProjectController extends Controller
         if ($project->image) {
             Storage::disk('public')->delete($project->image);
         }
-        
+
         $project->delete();
 
         return redirect()->route('projects.index')

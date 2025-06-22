@@ -18,15 +18,15 @@ class DashboardController extends Controller
         $data = [
             'recent_projects' => Project::with(['manager'])
                 ->latest()
-                ->take(5)
+                ->take(6)
                 ->get(),
             'upcoming_events' => Event::where('start_date', '>=', now())
                 ->orderBy('start_date')
-                ->take(3)
+                ->take(6)
                 ->get(),
             'active_vacancies' => Vacancy::where('status', 'open')
                 ->latest()
-                ->take(3)
+                ->take(6)
                 ->get(),
             'project_stats' => [
                 'total' => Project::count(),
@@ -35,7 +35,7 @@ class DashboardController extends Controller
             ],
             'events' => Event::where('start_date', '>=', now())
                 ->orderBy('start_date')
-                ->take(3)
+                ->take(6)
                 ->get(),
             'worflow_users' => User::where('position', '!=', 'admin')
                 ->orderBy('name')
