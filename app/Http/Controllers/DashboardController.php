@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $data = [
             'recent_projects' => Project::with(['manager'])
                 ->latest()
-                ->take(6)
+                ->take(3)
                 ->get(),
             'upcoming_events' => Event::where('start_date', '>=', now())
                 ->orderBy('start_date')

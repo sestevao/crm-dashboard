@@ -8,13 +8,8 @@
 
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 leading-tight">
-                    {{ __('Employees') }}
+                    {{ __('Messenger') }}
                 </h2>
-
-                <x-primary-button>
-                    <i class="fa-solid fa-plus"></i>
-                    Add Employee
-                </x-primary-button>
             </div>
         </div>
     </x-slot>

@@ -11,7 +11,7 @@ class VacationsController extends Controller
      */
     public function index()
     {
-        //
+        return view('vacancies.index');
     }
 
     /**

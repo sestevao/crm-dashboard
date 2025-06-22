@@ -11,7 +11,7 @@ class InfoPortalController extends Controller
      */
     public function index()
     {
-        //
+        return view('info-portal.index');
     }
 
     /**
