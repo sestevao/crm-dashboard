@@ -54,4 +54,9 @@ class Project extends Model
     {
         return $this->created_at->format('M d, Y');
     }
+
+    public function getFormattedDeadlineAttribute()
+    {
+        return $this->deadline->format('M d, Y');
+    }
 }

@@ -47,6 +47,7 @@ class User extends Authenticatable
         'skills' => 'array',
         'birth_date' => 'date',
         'hire_date' => 'date',
+        'password' => 'hashed',
     ];
 
     /**

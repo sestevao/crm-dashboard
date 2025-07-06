@@ -34,4 +34,10 @@ class ProjectUser extends Model
     {
         return $this->belongsTo(ProjectUser::class, 'assigned_to');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

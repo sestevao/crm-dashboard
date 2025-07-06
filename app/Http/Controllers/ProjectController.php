@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -55,7 +56,14 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        return view('projects.show', compact('project'));
+        $assignments = ProjectUser::where('project_id', $project->id)->get();
+        $allTasks = $project->tasks;
+
+        // Filter tasks based on is_backlog fiel
+        $backlogTasks = $allTasks->where('is_backlog', true);
+        $activeTasks = $allTasks->where('is_backlog', false);
+
+        return view('projects.show', compact('project', 'assignments', 'backlogTasks', 'activeTasks', 'allTasks'));
     }
 
     public function edit(Project $project)

@@ -76,6 +76,7 @@
                         @foreach($activeTasks as $task)
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-2 grid grid-cols-7 items-center my-4 w-full gap-x-4">
                             <div class="flex flex-col items-center justify-start">
+                                
                                 <p class="text-gray-400 dark:text-gray-300 text-sm">Task Name</p>
                                 <p class="text-black dark:text-white">{{ $task->title }}</p>
                             </div>
@@ -98,21 +99,7 @@
                             <!-- Priority -->
                             <div class="flex flex-col items-center justify-start">
                                 <p class="text-gray-400 dark:text-gray-300 text-sm">Priority</p>
-                                <div class="{{ $task->priority == 'high' ? 'text-red-500' : ($task->priority == 'medium' ? 'text-yellow-400' : 'text-green-500') }} flex items-center justify-center">
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        @if($task->priority == 'high')
-                                        <!-- Up arrow -->
-                                        <path d="M12 4l6 8h-12z" fill="currentColor" />
-                                        @elseif($task->priority == 'low')
-                                        <!-- Down arrow -->
-                                        <path d="M12 20l-6-8h12z" fill="currentColor" />
-                                        @else
-                                        <!-- Horizontal bar for medium -->
-                                        <path d="M4 12h16" stroke="currentColor" stroke-width="2" />
-                                        @endif
-                                    </svg>
-                                    <span class="font-bold capitalize text-sm">{{ $task->priority }}</span>
-                                </div>
+                                <x-priority-indicator :priority="$task->priority" />
                             </div>
 
                             <!-- Status -->
@@ -179,35 +166,12 @@
                             <!-- Priority -->
                             <div class="flex flex-col items-center justify-center">
                                 <p class="text-gray-400 dark:text-gray-300 text-sm">Priority</p>
-                                <div class="{{ $task->priority == 'high' ? 'text-red-500' : ($task->priority == 'medium' ? 'text-yellow-400' : 'text-green-500') }} flex items-center justify-center">
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        @if($task->priority == 'high')
-                                        <!-- Up arrow -->
-                                        <path d="M12 4l6 8h-12z" fill="currentColor" />
-                                        @elseif($task->priority == 'low')
-                                        <!-- Down arrow -->
-                                        <path d="M12 20l-6-8h12z" fill="currentColor" />
-                                        @else
-                                        <!-- Horizontal bar for medium -->
-                                        <path d="M4 12h16" stroke="currentColor" stroke-width="2" />
-                                        @endif
-                                    </svg>
-                                </div>
+                                <x-priority-indicator :priority="$task->priority" />
                             </div>
 
                             <!-- Progress Circle -->
                             <div class="p-2 m-2">
-                                <div class="relative w-6 h-6">
-                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                        <!-- Background circle -->
-                                        <path class="text-gray-200" stroke="currentColor" stroke-width="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                        <!-- Progress circle -->
-                                        @php
-                                        $progress = $task->progress ?? 0; // assuming 'progress' column (0 to 100)
-                                        @endphp
-                                        <path class="text-blue-500" stroke="currentColor" stroke-width="4" stroke-dasharray="{{ $progress }}, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    </svg>
-                                </div>
+                                <x-progress-circle :progress="$task->progress ?? 0" />
                             </div>
                         </div>
                         @endforeach
@@ -306,10 +270,11 @@
                             </div>
                             <div class="grid gap-2 rounded-lg p-2" style="grid-template-columns: repeat({{ $daysInMonth }}, minmax(40px, 1fr));">
                                 @for ($day = 1; $day <= $daysInMonth; $day++)
-                                    <div class="text-sm text-center p-2 bg-blue-50 rounded-lg text-gray-500 font-bold">
+                                <div class="text-sm text-center p-2 bg-blue-50 rounded-lg text-gray-500 font-bold">
                                     {{ $day }}
+                                </div>
+                                @endfor
                             </div>
-                            @endfor
                         </div>
                     </div>
                 </div>

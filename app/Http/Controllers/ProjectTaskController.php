@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class ProjectTaskController extends Controller
 {
-    public function show()
+    public function show(ProjectTask $task)
     {
-        return view('projects.tasks.show');
+        return view('projects.tasks.show', compact('task'));
     }
 
     public function store(Request $request)
