@@ -8,6 +8,7 @@ use App\Http\Controllers\VacationsController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\MessengerController;
 use App\Http\Controllers\InfoPortalController;
+use App\Http\Controllers\ProjectTaskAttachmentController;
 use App\Http\Controllers\ProjectTaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project?}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/tasks/{task}', [ProjectTaskController::class, 'show'])->name('tasks.show');
+
+    Route::post('/tasks/{task}/attachments', [ProjectTaskAttachmentController::class, 'store'])->name('attachments.store');
 
     // Other resource routes
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');

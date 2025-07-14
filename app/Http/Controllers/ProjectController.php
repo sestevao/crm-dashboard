@@ -60,8 +60,8 @@ class ProjectController extends Controller
         $allTasks = $project->tasks;
 
         // Filter tasks based on is_backlog fiel
-        $backlogTasks = $allTasks->where('is_backlog', true);
-        $activeTasks = $allTasks->where('is_backlog', false);
+        $backlogTasks = $allTasks->where('is_backlog', 1);
+        $activeTasks = $allTasks->where('is_backlog', 0);
 
         return view('projects.show', compact('project', 'assignments', 'backlogTasks', 'activeTasks', 'allTasks'));
     }

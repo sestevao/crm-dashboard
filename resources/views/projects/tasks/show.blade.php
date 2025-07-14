@@ -31,11 +31,11 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm text-gray-500">Estimate</p>
-                                <p class="text-gray-900 dark:text-gray-100">2h</p>
+                                <p class="text-gray-900 dark:text-gray-100">{{ $task->formatHoursToDaysHours($task->estimate ?? 0) }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Time Spent</p>
-                                <p class="text-gray-900 dark:text-gray-100">3h</p>
+                                <p class="text-gray-900 dark:text-gray-100">{{ $task->formatHoursToDaysHours($task->spent_time ?? 0) }}</p>
                             </div>
                         </div>
                         <div class="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -46,22 +46,14 @@
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Attachments</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <ul class="list-disc ml-4 text-sm">
                             @foreach($task->attachments as $attachment)
-                            <li>
-                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                                    <a href="{{ Storage::url($attachment->path) }}" class="text-blue-600 dark:text-blue-400 underline" target="_blank">
-                                        {{ $attachment->filename }}
-                                    </a>
-                                </div>
-                                </li>
-
-                            @endforeach
-                        </ul>
-                            <div class="flex items-center gap-2">
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <a href="{{ Storage::url($attachment->path) }}" class="flex items-center gap-2 text-blue-600 dark:text-blue-400" target="_blank">
                                     <i class="fas fa-file text-gray-400"></i>
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ $task->attachment }}</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ $attachment->filename }}</span>
+                                </a>
                             </div>
+                            @endforeach
                         </div>
                     </div>
 

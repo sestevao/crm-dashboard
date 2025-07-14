@@ -93,6 +93,7 @@
 
             <!-- Right Panel: Tasks -->
             <div class="w-full lg:w-3/4 lg:mt-0 flex flex-col h-full overflow-hidden">
+                <!-- Header/Filters     -->
                 <div class="flex items-center justify-between px-4">
                     <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">Tasks</h3>
 
@@ -113,7 +114,8 @@
                     </div>
                 </div>
 
-                <div id="list" class="px-4 mt-4">
+                <!-- Filter Section -->
+                <div id="list" class="flex-1 px-4 mt-4 hidden">
                     <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Active Tasks</h4>
 
                     @foreach($activeTasks as $task)
@@ -150,7 +152,6 @@
                     </a>
                     @endforeach
 
-                    <!-- Backlogs -->
                     <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 my-4">Backlogs</h4>
 
                     @foreach($backlogTasks as $task)
@@ -188,195 +189,133 @@
                     @endforeach
                 </div>
 
-                <div class="flex-1 overflow-hidden hidden" id="board">
+                <div id="board" class="flex-1 overflow-hidden hidden">
+                    @php
+                        $groupedActiveTasks = $activeTasks->groupBy(function($task) {
+                            return strtolower(str_replace(' ', '_', $task->status));
+                        });
+
+                        $groupedBacklogTasks = $backlogTasks->groupBy(function($task) {
+                            return strtolower(str_replace(' ', '_', $task->status));
+                        });
+                    @endphp
+                    
+                    {{-- Header Labels --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4 w-full">
-                        <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">To Do</div>
-                        <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">In Progress</div>
-                        <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">In Review</div>
-                        <div class="border-2 border-gray-100 rounded-full p-4 bg-gray-50 w-full text-center font-medium hover:bg-gray-100">Done</div>
+                        @foreach (['todo' => 'To Do', 'in_progress' => 'In Progress', 'review' => 'In Review', 'completed' => 'Done'] as $key => $label)
+                            <div class="border-2 border-gray-100 dark:border-gray-700 rounded-full p-4 bg-gray-50 dark:bg-gray-800 w-full text-center font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                                {{ $label }}
+                            </div>
+                        @endforeach
                     </div>
 
                     <div class="w-full text-center mb-4">
                         <h4 class="bg-gray-200 dark:bg-gray-700 rounded-xl p-2 text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Active Tasks</h4>
                     </div>
 
+                    {{-- Columns for tasks --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4 w-full">
-                        <div class="flex-col flex gap-2 task-column" data-id="todo">
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">UX sketches</span>
+                        @foreach (['todo', 'in_progress', 'review', 'completed'] as $status)
+                            <div class="flex flex-col gap-2 task-column " data-id="{{ $status }}">
+                                @forelse ($groupedActiveTasks[$status] ?? [] as $task)
+                                    <div class="bg-white dark:bg-gray-800 p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card m-2">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">TS000{{ $task->id }}</span>
+                                        <span class="text-gray-800 dark:text-gray-100">{{ $task->title }}</span>
 
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">4d</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
+                                        <div class="flex items-center justify-between w-full mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="bg-blue-50 dark:bg-blue-900 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded-lg">
+                                                    {{ $task->estimate ?? '0d' }}
+                                                </span>
+                                                <x-priority-indicator :priority="$task->priority" />
+                                            </div>
+                                            <img src="{{ $task->assignee->avatar ?? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . rand(1, 1000) }}"
+                                                class="rounded-full h-6 w-6 object-contain" alt="{{ $task->assignee->name ?? 'Assignee' }}">
+                                        </div>
                                     </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
+                                @empty
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No tasks</p>
+                                @endforelse
                             </div>
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">UX Login + Registration</span>
-
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">UI Login + Registration (+ other screens)</span>
-
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">1d 6h</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex-col flex gap-2 task-column" data-id="inprogress">
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">Mind Map</span>
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d 4h</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex-col flex gap-2 task-column" data-id="inreview">
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">Research reports</span>
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">2d</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">Research reports (presentation for client)</span>
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">6h</span>
-                                        <i class="fas fa-arrow-down text-green-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex-col flex gap-2 task-column" data-id="done">
-                            <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow task-card">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">Research</span>
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">4d</span>
-                                        <i class="fas fa-arrow-up text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
 
-
-                    <div class="bg-gray-200 rounded-xl px-6 py-2 text-center flex flex-col items-center justify-center gap-4 shadow">
-                        <h4 class=" rounded-xl text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Backlogs</h4>
+                    <div class="bg-gray-200 dark:bg-gray-800 rounded-xl px-6 py-2 text-center flex flex-col items-center justify-center gap-4 shadow">
+                        <h4 class="rounded-xl text-center font-semibold text-gray-700 dark:text-gray-200 mb-4">Backlogs</h4>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                            <!-- Task Card -->
-                            @for ($i = 0; $i < 3; $i++)
-                                <div class="bg-white p-4 flex flex-col items-start gap-2 rounded-xl shadow">
-                                <span class="text-sm text-gray-600 font-medium">TS000145</span>
-                                <span class="text-gray-800">Animation for buttons</span>
+                            @foreach (['todo', 'in_progress', 'review', 'completed'] as $status)
+                                <div class="task-column" data-id="{{ $status }}">
+                                    @forelse ($groupedBacklogTasks[$status] ?? [] as $task)
+                                        <div class="bg-white dark:bg-gray-900 p-4 flex flex-col items-start gap-2 rounded-xl shadow">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">TS000{{ $task->id }}</span>
+                                            <span class="text-gray-800 dark:text-gray-100">{{ $task->title }}</span>
 
-                                <div class="flex items-center justify-between w-full mt-2">
-                                    <div class="flex items-center gap-1">
-                                        <span class="bg-blue-50 text-gray-600 text-xs px-2 py-1 rounded-lg">8h</span>
-                                        <i class="fas fa-arrow-down text-green-400 text-sm"></i>
-                                    </div>
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain">
+                                            <div class="flex items-center justify-between w-full mt-2">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="bg-blue-50 dark:bg-blue-900 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded-lg">8h</span>
+                                                    <i class="fas fa-arrow-down text-green-400 text-sm"></i>
+                                                </div>
+                                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ rand(1, 1000) }}" class="rounded-full h-6 w-6 object-contain" alt="Assignee Avatar">
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">No tasks</p>
+                                    @endforelse
                                 </div>
+                            @endforeach
                         </div>
-                        @endfor
-                    </div>
-                </div>
-
-            </div>
-
-            <div id="timeline" class="p-4 hidden">
-                <!-- Task Rows -->
-                @php
-                $tasks = [ 'Research', 'Mind Map', 'UX Login + Registration', 'UI Kit', 'Testing', 'Client Feedback', 'Bug Fixing', 'Moodboard', 'Reports', 'Final Review'];
-
-                // Get current month's dates
-                $currentMonth = now();
-                $daysInMonth = $currentMonth->daysInMonth;
-                @endphp
-
-                <!-- Timeline Header -->
-                <div class="flex bg-white rounded-lg p-2 overflow-x-auto">
-                    <!-- Fixed Task Label Header -->
-                    <div class="w-[200px] shrink-0 bg-white border-r-2 border-b-2 border-r-gray-200 border-b-gray-200 font-semibold text-left p-2 flex items-center justify-between">
-                        <div class="flex flex-col">
-                            All Tasks
-                            <span class="text-sm text-gray-500 pt-4">(10 tasks)</span>
-                        </div>
-                        <i class="fas fa-angle-right self-center mt-2 px-2"></i>
                     </div>
 
-                    <!-- Scrollable Date Header -->
-                    <div class="overflow-x-auto w-full border-b-2 border-b-gray-200">
-                        <div class="grid w-full">
-                            <div class="col-span-31  text-center p-2 font-medium"> First Month (May)</div>
+                </div>
+
+                <div id="timeline" class="mt-4 overflow-x-auto">
+                    @php
+                        $currentMonth = now();
+                        $daysInMonth = $currentMonth->daysInMonth;
+                    @endphp
+
+                    <!-- Timeline Header & Rows container -->
+                    <div class="min-w-max">
+                        <div class="flex border-b border-gray-200 dark:border-gray-700">
+                            <div class="w-[200px] flex-shrink-0 p-2 border-r border-gray-200 dark:border-gray-700 font-semibold text-left flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    All Tasks
+                                    <span class="text-sm text-gray-500 dark:text-gray-400 pt-1">({{ $tasks->count() }} tasks)</span>
+                                </div>
+                                <i class="fas fa-angle-right px-2 text-gray-400 dark:text-gray-500"></i>
+                            </div>
+
+                            <!-- Days Header -->
+                            <div class="grid grid-cols-{{ $daysInMonth }} min-w-[calc(40px*{{ $daysInMonth }})] gap-2 p-2">
+                                @for ($day = 1; $day <= $daysInMonth; $day++)
+                                    <label class="text-center text-sm font-bold text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                                    {{ $day }}
+                                    </label>
+                                @endfor
+                            </div>
                         </div>
-                        <div class="grid gap-2 rounded-lg p-2" style="grid-template-columns: repeat({{ $daysInMonth }}, minmax(40px, 1fr));">
-                            @for ($day = 1; $day <= $daysInMonth; $day++)
-                                <div class="text-sm text-center p-2 bg-blue-50 rounded-lg text-gray-500 font-bold">
-                                {{ $day }}
-                        </div>
-                        @endfor
+
+                        <!-- Task Rows -->
+                        @foreach ($tasks as $task)
+                            <div class="flex border-b border-gray-200 dark:border-gray-700">
+                                <div class="w-[200px] flex-shrink-0 p-4 border-r border-gray-200 dark:border-gray-700 font-semibold text-left flex items-center">
+                                {{ $task }}
+                                </div>
+
+                                <div class="grid grid-cols-{{ $daysInMonth }} min-w-[calc(40px*{{ $daysInMonth }})] gap-2 p-2">
+                                @for ($day = 1; $day <= $daysInMonth; $day++)
+                                    <label class="cursor-pointer rounded-lg text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-800 p-2 text-center transition duration-200 hover:bg-blue-200 dark:hover:bg-blue-700" data-task="{{ $task->id }}" data-day="{{ $day }}" onclick="handleTaskDay(this)">
+                                    {{ $day }}
+                                    </label>
+                                @endfor
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
-
-            @foreach ($tasks as $task)
-            <div class="flex bg-white border-b-2 border-b-gray-200 transition-all duration-200">
-                <div class="w-[200px] shrink-0 bg-white border-r-2 border-r-gray-200 font-semibold text-left p-4 mx-2 flex items-center justify-between">
-                    {{ $task }}
-                </div>
-
-                <div class="grid gap-2 rounded-lg" style="grid-template-columns: repeat({{ $daysInMonth }}, minmax(40px, 1fr));" data-task="{{ $task }}">
-                    @for ($day = 1; $day <= $daysInMonth; $day++)
-                        <div class="task-day p-2 m-1 rounded-lg cursor-pointer transition-all duration-200 text-blue-100 bg-blue-50"
-                        data-task="{{ $task }}"
-                        data-day="{{ $day }}"
-                        onclick="handleTaskDay(this)">
-                        {{$day}}
-                </div>
-                @endfor
             </div>
         </div>
-        @endforeach
-    </div>
-    </div>
-    </div>
-    </div>
     </div>
 
     <x-modal name="filter-modal" :show="false" maxWidth="lg" position="right">
@@ -538,6 +477,18 @@
         .task-card:active {
             cursor: grabbing;
         }
+ 
+        #timeline {
+            position: relative; /* or just let it inherit default */
+        }
+ 
+        #timeline .day-grid {
+            min-width: calc(40px * {{ $daysInMonth }});
+            overflow-x: auto;
+            display: grid;
+            grid-template-columns: repeat({{ $daysInMonth }}, 40px);
+            gap: 8px;
+        }
     </style>
 
     <script>
@@ -560,96 +511,54 @@
             $('#list, #board, #timeline').hide();
             $('#listViewBtn, #boardViewBtn, #timelineViewBtn').removeClass('active');
             $('#' + viewId + 'ViewBtn').addClass('active');
+            $('#' + viewId).css('display', 'block');
             $('#' + viewId).show();
         }
 
-        const tasks = [{
-                name: "Research",
-                start: 1,
-                duration: Math.floor(Math.random() * 4) + 2
-            },
-            {
-                name: "Mind Map",
-                start: 4,
-                duration: Math.floor(Math.random() * 3) + 2
-            },
-            {
-                name: "UX Login + Registration",
-                start: 8,
-                duration: Math.floor(Math.random() * 5) + 3
-            },
-            {
-                name: "Testing",
-                start: 13,
-                duration: Math.floor(Math.random() * 4) + 2
-            },
-            {
-                name: "Client Feedback",
-                start: 16,
-                duration: Math.floor(Math.random() * 3) + 1
-            },
-            {
-                name: "Moodboard",
-                start: 18,
-                duration: Math.floor(Math.random() * 4) + 2
-            },
-            {
-                name: "Reports",
-                start: 22,
-                duration: Math.floor(Math.random() * 3) + 2
-            },
-            {
-                name: "Final Review",
-                start: 25,
-                duration: Math.floor(Math.random() * 3) + 1
-            }
-        ];
-
-
+        const tasks = @json($tasks);
 
         // Show the list view by default when the page loads using jQuery's ready function
         $(document).ready(function() {
-            showView('list');
+            showView('timeline');
             window.toggleFilter = toggleFilter;
             initializeTaskDays();
 
-            const placeholderHTML = '<div class="drop-placeholder h-20 border-2 border-dashed border-gray-300 rounded-xl my-2"></div>';
+            if (typeof tasks !== 'undefined') {
+                const placeholderHTML = '<div class="drop-placeholder h-20 border-2 border-dashed border-gray-300 rounded-xl my-2"></div>';
 
-            $('.task-column').each(function() {
-                new Sortable(this, {
-                    group: 'shared',
-                    animation: 150,
-                    ghostClass: 'bg-blue-100',
+                $('.task-column').each(function() {
+                    new Sortable(this, {
+                        group: 'shared',
+                        animation: 150,
+                        ghostClass: 'bg-blue-100',
 
-                    onStart: function(evt) {
-                        // Add placeholder to each column
-                        $('.task-column').each(function() {
-                            $(this).append(placeholderHTML);
-                        });
-                    },
+                        onStart: function(evt) {
+                            $('.task-column').each(function() {
+                                $(this).append(placeholderHTML);
+                            });
+                        },
 
-                    onEnd: function(evt) {
-                        const task = evt.item;
-                        const newColumn = $(evt.to).data('id');
-
-                        console.log(`Task moved to: ${newColumn}`);
-
-                        $('.drop-placeholder').remove();
-                    }
+                        onEnd: function(evt) {
+                            const task = evt.item;
+                            const newColumn = $(evt.to).data('id');
+                            console.log(`Task moved to: ${newColumn}`);
+                            $('.drop-placeholder').remove();
+                        }
+                    });
                 });
-            });
 
-            tasks.forEach(task => {
-                const $row = $(`div[data-task="${task.name}"]`);
-                const $cells = $row.children();
-                for (let i = 0; i < task.duration; i++) {
-                    $cells.eq(task.start - 1 + i).remove();
-                }
-                const $taskBlock = $(`<div class="bg-blue-500 col-span-${task.duration} rounded text-xs text-white text-center flex items-center justify-center" style="grid-column: span ${task.duration};">`).text(task.name);
-                $cells.eq(task.start - 1).before($taskBlock);
-            });
-
-
+                tasks.forEach(task => {
+                    const $row = $(`div[data-task="${task.id}"]`);
+                    const $cells = $(`label[data-task="${task.id}"]`);
+                    for (let i = 0; i < task.duration; i++) {
+                        $cells.eq(task.start - 1 + i).remove();
+                    }
+                    const $taskBlock = $(`<div class="bg-blue-500 col-span-${task.duration} rounded text-xs text-white text-center flex items-center justify-center" style="grid-column: span ${task.duration};">`).text(task.name);
+                    $cells.eq(task.start - 1).before($taskBlock);
+                });
+            } else {
+                console.warn('tasks is not defined');
+            }
         });
 
         function initializeTaskDays() {
@@ -657,7 +566,7 @@
                 const $this = $(this);
                 const taskName = $this.data('task');
                 const day = parseInt($this.data('day'));
-                // updateTaskDayStyle($this, isTaskActive(taskName, day));
+                updateTaskDayStyle($this, isTaskActive(taskName, day));
                 if (isTaskActive(taskName, day)) {
                     $this.removeClass('bg-blue-50 text-blue-100').addClass('bg-blue-500 text-white active');
                 }
@@ -666,10 +575,8 @@
 
         function updateTaskDayStyle($element, isActive) {
             if (isActive) {
-                console.log('vvv')
                 $element.addClass('active bg-blue-500 text-white').removeClass('bg-blue-50 text-blue-100');
             } else {
-                console.log('aaa')
                 $element.removeClass('active bg-blue-500 text-white').addClass('bg-blue-50 text-blue-100');
             }
         }

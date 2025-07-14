@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('project_task_attachments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('project_task_id')->constrained()->onDelete('cascade');
+            $table->string('filename');
+            $table->string('path');
             $table->timestamps();
         });
     }
