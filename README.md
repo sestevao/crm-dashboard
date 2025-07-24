@@ -1,6 +1,12 @@
 # CRM Dashboard
 
-A comprehensive Customer Relationship Management system built with Laravel, featuring a modern dashboard interface for managing company resources, projects, and team collaboration.
+A comprehensive Customer Relationship Management system built with Laravel, based on the CRM Workroom community design. This project features a modern dashboard interface for managing company resources, projects, and team collaboration.
+
+## Design System
+
+This project is implemented based on these community Figma designs:
+- [CRM Workroom Design](https://www.figma.com/design/VqCIbVnFaUTsp1OKd3Sfnj/CRM-Woorkroom--Community-?node-id=0-23083&t=mykQPzXiq0xV2b3J-0)
+- [CRM System Design](https://www.figma.com/design/W91AxudqPE2fjIvElPb5rb/CRM-system--Community-?node-id=0-1&p=f&t=BEbj9BUv5dvqs4VV-0)
 
 <p align="center">
   <img src="github/dashboard.png" alt="CRM Dashboard Screenshot" width="100%">
